@@ -9,18 +9,38 @@ const api = axios.create({
   },
 });
 
+// Request interceptor (sin autenticación)
+api.interceptors.request.use(
+  (config) => {
+    // Sin autenticación - acceso directo
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Response interceptor to handle errors
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    console.error('API Error:', error);
+    // Sin redirección a login - solo retornar el error
+    console.warn('API Error:', error.response?.status, error.response?.data);
     return Promise.reject(error);
   }
 );
 
-// Auth API - Removed for public access
+// Auth API
+export const authAPI = {
+  register: (data) => api.post('/register', data),
+  login: (data) => api.post('/login', data),
+  logout: () => api.post('/logout'),
+  me: () => api.get('/me'),
+  updateProfile: (data) => api.put('/profile', data),
+  changePassword: (data) => api.put('/change-password', data),
+};
 
 // Organization API
 export const organizationAPI = {
